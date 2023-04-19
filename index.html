@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Chasing the Clicks</title>
+    <link rel="stylesheet" href="style1.css" />
+    <!-- Load Leaflet CSS and JS files -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chasing the Clicks</h1>
+    <p>Clicks: <span id="click-count">0</span></p>
+    <button id="click-button">Click me !</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Total clicks</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="clicks-table-body">
+        </tbody>
+    </table>
+    <div id="map"></div>
+    <script>
+        // Initialize Leaflet map
+        var mymap = L.map("map").setView([0, 0], 5);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "Map data © <a href='https://openstreetmap.org'>OpenStreetMap</a> contributors",
+            maxZoom: 18,
+        }).addTo(mymap);
+
+        // Load click count from local storage
+        var clickCount = parseInt(localStorage.getItem("clickCount")) || 0;
+        document.getElementById("click-count").textContent = clickCount;
+
+        // Update clicks table
+        var tableBody = document.getElementById("clicks-table-body");
+        var row = tableBody.insertRow();
+        var cell1 = row.insertCell();
+        var cell2 = row.insertCell();
+        var cell3 = row.insertCell();
+        cell1.textContent = clickCount;
+        cell2.textContent = "-";
+        cell3.textContent = "-";
+
+        // Listen for clicks on button
+        var button = document.getElementById("click-button");
+        button.addEventListener("click", function () {
+            // Increase click count and update display
+            clickCount++;
+            document.getElementById("click-count").textContent = clickCount;
+
+            // Save click count to local storage
+            localStorage.setItem("clickCount", clickCount);
+
+            // Get user's IP address and location
+            fetch("https://ipgeolocation.abstractapi.com/v1/?api_key=13bd62f2451c4043968b4d431ba70a2c")
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Failed to retrieve location data.");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    // Update map with marker at user's location
+                    var marker = L.marker([data.latitude, data.longitude]).addTo(mymap);
+
+                    mymap.setView([data.latitude, data.longitude]);
+
+                    // Add popup with location details to marker
+                    marker.bindPopup(
+                        "<b>Your location:</b><br>" +
+                        "Latitude: " + data.latitude + "<br>" +
+                        "Longitude: " + data.longitude + "<br>" +
+                        "City: " + data.city + "<br>" +
+                        "Region: " + data.region + "<br>" +
+                        "Country: " + data.country
+                    ).openPopup();
+
+                    // Create a new row in the table
+                    var table = document.getElementById("clicks-table");
+                    var row = table.insertRow(-1);
+
+                    // Add cells to the row
+                    var cityCell = row.insertCell(0);
+                    var countryCell = row.insertCell(1);
+                    var clicksCell = row.insertCell(2);
+
+                    // Set the cell values
+                    cityCell.innerHTML = data.city;
+                    countryCell.innerHTML = data.country;
+                    clicksCell.innerHTML = clickCount;
+                })
+                .catch((error => {
+                    console.error(error);
+                }));
+        });
+    </script>
+    <table id="clicks-table">
+        <thead>
+            <tr>
+                <th>City</th>
+                <th>Country</th>
+                <th>Clicks</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows for click data will be added here -->
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,47 @@
+/* Style for the button */
+button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Style for the click count */
+#clickCount {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 20px;
+}
+
+/* Style for the table */
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 50%;
+  margin: 20px;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Style for the map */
+#map {
+  height: 400px;
+  width: 50%;
+  margin: 20px;
+}
